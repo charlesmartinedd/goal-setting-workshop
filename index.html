@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goal Setting Workshop - Tony Robbins Day 12</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        coral: '#e07a5f',
+                        sunset: '#3d405b',
+                        golden: '#f2cc8f',
+                        cream: '#faf7f2',
+                        sage: '#81b29a',
+                        peach: '#fcd5ce'
+                    },
+                    fontFamily: {
+                        display: ['Playfair Display', 'serif'],
+                        body: ['Nunito', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Nunito', sans-serif; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #faf7f2 0%, #fcd5ce 50%, #f4a261 100%);
+        }
+        .gradient-warm {
+            background: linear-gradient(135deg, #e07a5f 0%, #f4a261 100%);
+        }
+        .timer-ring {
+            transform: rotate(-90deg);
+        }
+        .timer-ring circle {
+            transition: stroke-dashoffset 1s linear;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .pulse-warning {
+            animation: pulse 1s ease-in-out infinite;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti {
+            animation: confetti-fall 3s ease-out forwards;
+        }
+        /* Print styles */
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; }
+            .gradient-bg { background: white !important; }
+        }
+        .print-only { display: none; }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <!-- Profile Selection Screen -->
+    <div id="profileScreen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white/90 backdrop-blur rounded-3xl shadow-2xl p-8 max-w-lg w-full text-center">
+            <h1 class="text-4xl font-display font-bold text-sunset mb-2">Goal Setting Workshop</h1>
+            <p class="text-coral text-lg mb-2">Tony Robbins - Personal Power Day 12</p>
+            <p class="text-gray-600 mb-8">Create your compelling future as a family</p>
+
+            <div class="mb-8">
+                <label class="block text-sunset font-semibold mb-3">Who's doing the workshop?</label>
+                <div class="grid grid-cols-3 gap-3" id="profileButtons">
+                    <button onclick="selectProfile('Charles')" class="profile-btn bg-coral/10 hover:bg-coral/20 text-coral font-semibold py-4 px-6 rounded-xl transition-all hover:scale-105 border-2 border-transparent hover:border-coral">
+                        Charles
+                    </button>
+                    <button onclick="selectProfile('Marie')" class="profile-btn bg-golden/30 hover:bg-golden/50 text-sunset font-semibold py-4 px-6 rounded-xl transition-all hover:scale-105 border-2 border-transparent hover:border-golden">
+                        Marie
+                    </button>
+                    <button onclick="selectProfile('Alexandria')" class="profile-btn bg-sage/20 hover:bg-sage/30 text-sage font-semibold py-4 px-6 rounded-xl transition-all hover:scale-105 border-2 border-transparent hover:border-sage">
+                        Alexandria
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sunset font-semibold mb-2">Or enter a new name:</label>
+                <input type="text" id="customName" placeholder="Enter name..."
+                    class="w-full px-4 py-3 rounded-xl border-2 border-golden/50 focus:border-coral focus:outline-none text-center text-lg">
+            </div>
+
+            <button onclick="startWorkshop()"
+                class="gradient-warm text-white font-bold py-4 px-8 rounded-xl text-lg hover:opacity-90 transition-all hover:scale-105 shadow-lg">
+                Begin Workshop
+            </button>
+
+            <p class="text-gray-500 text-sm mt-6">Your goals are saved locally on this device</p>
+        </div>
+    </div>
+
+    <!-- Main Workshop Screen -->
+    <div id="workshopScreen" class="hidden min-h-screen">
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur shadow-sm sticky top-0 z-50 no-print">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🎯</span>
+                    <div>
+                        <h2 class="font-display font-bold text-sunset">Goal Setting Workshop</h2>
+                        <p class="text-sm text-coral" id="currentUser">Charles's Goals</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-sm text-gray-600">
+                        Step <span id="currentStep" class="font-bold text-coral">1</span> of <span id="totalSteps">13</span>
+                    </div>
+                    <button onclick="switchProfile()" class="text-sunset hover:text-coral transition-colors">
+                        Switch Profile
+                    </button>
+                    <button onclick="showSummary()" class="bg-sage text-white px-4 py-2 rounded-lg hover:bg-sage/80 transition-colors">
+                        View Summary
+                    </button>
+                </div>
+            </div>
+            <!-- Progress Bar -->
+            <div class="h-1 bg-gray-200">
+                <div id="progressBar" class="h-full gradient-warm transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </header>
+
+        <!-- Video and Writing Area -->
+        <main class="max-w-6xl mx-auto p-4">
+            <div class="grid lg:grid-cols-2 gap-6">
+                <!-- Video Panel -->
+                <div class="bg-white/90 backdrop-blur rounded-2xl shadow-xl overflow-hidden">
+                    <div class="relative">
+                        <video id="workshopVideo" class="w-full" controls>
+                            <source src="video/tony-robbins-day12.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <!-- Video Overlay when paused for writing -->
+                        <div id="videoOverlay" class="hidden absolute inset-0 bg-sunset/90 flex items-center justify-center">
+                            <div class="text-center text-white p-6">
+                                <p class="text-2xl font-display mb-2">Time to Write!</p>
+                                <p class="text-golden">Use the panel on the right →</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-sunset/5">
+                        <p class="text-sunset text-sm" id="currentSection">
+                            <span class="font-semibold">Current:</span> Introduction
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Writing Panel -->
+                <div id="writingPanel" class="bg-white/90 backdrop-blur rounded-2xl shadow-xl p-6">
+                    <!-- Waiting State -->
+                    <div id="waitingState" class="text-center py-12">
+                        <div class="text-6xl mb-4">🎬</div>
+                        <h3 class="text-2xl font-display text-sunset mb-2">Watch the Video</h3>
+                        <p class="text-gray-600">The writing prompts will appear when Tony tells you to start writing.</p>
+                        <p class="text-coral mt-4 text-sm">Tip: Have your pen and paper ready, or type here!</p>
+                    </div>
+
+                    <!-- Writing State -->
+                    <div id="writingState" class="hidden">
+                        <!-- Timer -->
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 id="writingTitle" class="text-xl font-display text-sunset">Personal Development Goals</h3>
+                            <div class="flex items-center gap-2">
+                                <svg class="timer-ring w-16 h-16" viewBox="0 0 60 60">
+                                    <circle cx="30" cy="30" r="26" fill="none" stroke="#f2cc8f" stroke-width="4"/>
+                                    <circle id="timerCircle" cx="30" cy="30" r="26" fill="none" stroke="#e07a5f" stroke-width="4"
+                                        stroke-dasharray="163.36" stroke-dashoffset="0" stroke-linecap="round"/>
+                                </svg>
+                                <span id="timerDisplay" class="text-2xl font-bold text-coral">6:00</span>
+                            </div>
+                        </div>
+
+                        <!-- Prompt -->
+                        <div id="promptArea" class="bg-golden/20 rounded-xl p-4 mb-4 italic text-sunset">
+                            "Who do you want to become? What would you like to learn? Where would you like to go?"
+                        </div>
+
+                        <!-- Text Area -->
+                        <textarea id="goalsInput"
+                            class="w-full h-64 p-4 rounded-xl border-2 border-golden/50 focus:border-coral focus:outline-none resize-none text-lg"
+                            placeholder="Start typing your goals... Keep writing! Don't stop!"></textarea>
+
+                        <!-- Buttons -->
+                        <div class="flex gap-3 mt-4">
+                            <button onclick="needMoreTime()"
+                                class="flex-1 bg-golden/30 text-sunset font-semibold py-3 rounded-xl hover:bg-golden/50 transition-colors">
+                                + More Time
+                            </button>
+                            <button onclick="finishWriting()"
+                                class="flex-1 gradient-warm text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-colors">
+                                Continue Video →
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Selection State -->
+                    <div id="timelineState" class="hidden">
+                        <h3 class="text-xl font-display text-sunset mb-4">Assign Timelines to Your Goals</h3>
+                        <p class="text-gray-600 mb-4">Click each goal and select when you'll achieve it:</p>
+                        <div id="goalsForTimeline" class="space-y-3 max-h-80 overflow-y-auto mb-4">
+                            <!-- Goals will be populated here -->
+                        </div>
+                        <button onclick="finishTimelines()"
+                            class="w-full gradient-warm text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-colors">
+                            Continue Video →
+                        </button>
+                    </div>
+
+                    <!-- Top 3 Selection State -->
+                    <div id="top3State" class="hidden">
+                        <h3 class="text-xl font-display text-sunset mb-2">Select Your Top 3 One-Year Goals</h3>
+                        <p class="text-gray-600 mb-4">These should really excite and drive you:</p>
+                        <div id="oneYearGoals" class="space-y-2 max-h-48 overflow-y-auto mb-4">
+                            <!-- One-year goals will be populated here -->
+                        </div>
+                        <div class="border-t pt-4">
+                            <p class="text-sm text-coral mb-2">Selected: <span id="selectedCount">0</span>/3</p>
+                            <div id="selectedTop3" class="space-y-2 mb-4">
+                                <!-- Selected goals will appear here -->
+                            </div>
+                        </div>
+                        <button id="top3ContinueBtn" onclick="finishTop3Selection()" disabled
+                            class="w-full bg-gray-300 text-gray-500 font-semibold py-3 rounded-xl cursor-not-allowed transition-colors">
+                            Select 3 Goals to Continue
+                        </button>
+                    </div>
+
+                    <!-- WHY Writing State -->
+                    <div id="whyState" class="hidden">
+                        <h3 class="text-xl font-display text-sunset mb-2">Why is this goal important?</h3>
+                        <div id="whyGoalDisplay" class="bg-coral/10 rounded-xl p-4 mb-4 text-coral font-semibold">
+                            Goal will appear here
+                        </div>
+                        <div class="flex items-center justify-end gap-2 mb-4">
+                            <svg class="timer-ring w-12 h-12" viewBox="0 0 60 60">
+                                <circle cx="30" cy="30" r="26" fill="none" stroke="#f2cc8f" stroke-width="4"/>
+                                <circle id="whyTimerCircle" cx="30" cy="30" r="26" fill="none" stroke="#e07a5f" stroke-width="4"
+                                    stroke-dasharray="163.36" stroke-dashoffset="0" stroke-linecap="round"/>
+                            </svg>
+                            <span id="whyTimerDisplay" class="text-xl font-bold text-coral">2:00</span>
+                        </div>
+                        <textarea id="whyInput"
+                            class="w-full h-40 p-4 rounded-xl border-2 border-golden/50 focus:border-coral focus:outline-none resize-none"
+                            placeholder="Write a paragraph explaining WHY you're absolutely committed to achieving this goal within one year..."></textarea>
+                        <button onclick="finishWhy()"
+                            class="w-full gradient-warm text-white font-semibold py-3 rounded-xl mt-4 hover:opacity-90 transition-colors">
+                            Continue →
+                        </button>
+                    </div>
+
+                    <!-- Action Steps State -->
+                    <div id="actionState" class="hidden">
+                        <h3 class="text-xl font-display text-sunset mb-4">Immediate Action Steps</h3>
+                        <p class="text-gray-600 mb-4">What ONE action can you take TODAY for each goal?</p>
+                        <div id="actionGoals" class="space-y-4 max-h-96 overflow-y-auto">
+                            <!-- Goals with action inputs will be populated here -->
+                        </div>
+                        <button onclick="finishActions()"
+                            class="w-full gradient-warm text-white font-semibold py-3 rounded-xl mt-4 hover:opacity-90 transition-colors">
+                            Continue to Rocking Chair Test →
+                        </button>
+                    </div>
+
+                    <!-- Rocking Chair Test State -->
+                    <div id="rockingChairState" class="hidden">
+                        <h3 class="text-xl font-display text-sunset mb-4">🪑 The Rocking Chair Test</h3>
+                        <p class="text-gray-600 mb-4">Imagine you're 85-90 years old, looking back on your life...</p>
+
+                        <div class="mb-6">
+                            <label class="block text-coral font-semibold mb-2">If you DIDN'T achieve these goals, how would you feel?</label>
+                            <textarea id="rockingChairPain"
+                                class="w-full h-24 p-3 rounded-xl border-2 border-coral/30 focus:border-coral focus:outline-none resize-none"
+                                placeholder="What would you miss out on? What would it cost you?"></textarea>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sage font-semibold mb-2">If you DID achieve ALL these goals, how would you feel?</label>
+                            <textarea id="rockingChairPleasure"
+                                class="w-full h-24 p-3 rounded-xl border-2 border-sage/30 focus:border-sage focus:outline-none resize-none"
+                                placeholder="How would you feel about your life? What joy would you have experienced?"></textarea>
+                        </div>
+
+                        <button onclick="finishWorkshop()"
+                            class="w-full gradient-warm text-white font-bold py-4 rounded-xl hover:opacity-90 transition-colors text-lg">
+                            Complete Workshop! 🎉
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Summary Screen -->
+    <div id="summaryScreen" class="hidden min-h-screen p-4">
+        <div class="max-w-4xl mx-auto">
+            <!-- Print Header -->
+            <div class="print-only text-center mb-8">
+                <h1 class="text-3xl font-display font-bold">My Goals - Goal Setting Workshop</h1>
+                <p class="text-gray-600">Tony Robbins Personal Power Day 12</p>
+            </div>
+
+            <div class="bg-white/90 backdrop-blur rounded-2xl shadow-xl p-8 print:shadow-none print:bg-white">
+                <div class="flex items-center justify-between mb-6 no-print">
+                    <h2 class="text-3xl font-display font-bold text-sunset">Your Goals Summary</h2>
+                    <div class="flex gap-3">
+                        <button onclick="hideSummary()" class="text-gray-500 hover:text-gray-700">← Back</button>
+                        <button onclick="window.print()" class="bg-coral text-white px-4 py-2 rounded-lg hover:bg-coral/80">
+                            🖨️ Print Goals
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-center mb-6">
+                    <p class="text-xl text-coral font-display" id="summaryName">Charles's Goals</p>
+                    <p class="text-gray-500" id="summaryDate"></p>
+                </div>
+
+                <div class="border-t pt-6">
+                    <blockquote class="text-center italic text-sunset mb-8">
+                        "The purpose of a goal is not to get it. The purpose of a goal is who you become in pursuit of it."
+                        <footer class="text-coral mt-2">— Tony Robbins</footer>
+                    </blockquote>
+                </div>
+
+                <!-- Personal Development Goals -->
+                <section class="mb-8">
+                    <h3 class="text-xl font-display font-bold text-coral mb-4 flex items-center gap-2">
+                        <span>🌱</span> Personal Development Goals
+                    </h3>
+                    <div id="summaryPersonal" class="space-y-4">
+                        <!-- Goals will be populated here -->
+                    </div>
+                </section>
+
+                <!-- Thing Goals -->
+                <section class="mb-8">
+                    <h3 class="text-xl font-display font-bold text-golden mb-4 flex items-center gap-2">
+                        <span>✨</span> Thing Goals
+                    </h3>
+                    <div id="summaryThings" class="space-y-4">
+                        <!-- Goals will be populated here -->
+                    </div>
+                </section>
+
+                <!-- Financial Goals -->
+                <section class="mb-8">
+                    <h3 class="text-xl font-display font-bold text-sage mb-4 flex items-center gap-2">
+                        <span>💰</span> Financial Goals
+                    </h3>
+                    <div id="summaryFinancial" class="space-y-4">
+                        <!-- Goals will be populated here -->
+                    </div>
+                </section>
+
+                <!-- Rocking Chair Test -->
+                <section class="mb-8 bg-sunset/5 rounded-xl p-6">
+                    <h3 class="text-xl font-display font-bold text-sunset mb-4">🪑 Rocking Chair Reflection</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-coral font-semibold mb-2">If I don't achieve these goals:</p>
+                            <p id="summaryPain" class="text-gray-700 italic"></p>
+                        </div>
+                        <div>
+                            <p class="text-sage font-semibold mb-2">When I achieve these goals:</p>
+                            <p id="summaryPleasure" class="text-gray-700 italic"></p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Commitment -->
+                <section class="text-center border-t pt-6">
+                    <p class="text-lg text-sunset mb-4">I am committed to achieving these 9 goals within one year.</p>
+                    <p class="text-coral font-display text-2xl" id="commitmentSignature"></p>
+                    <p class="text-gray-500" id="commitmentDate"></p>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confetti Container -->
+    <div id="confettiContainer" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
+
+    <script>
+        // ==========================================
+        // STATE MANAGEMENT
+        // ==========================================
+        let currentProfile = '';
+        let workshopData = {
+            personal: { goals: [], timelines: {}, top3: [], whys: {} },
+            things: { goals: [], timelines: {}, top3: [], whys: {} },
+            financial: { goals: [], timelines: {}, top3: [], whys: {} },
+            actions: {},
+            rockingChair: { pain: '', pleasure: '' },
+            completed: false
+        };
+
+        // Video pause points (timestamps in seconds) - CALIBRATE THESE
+        const pausePoints = [
+            { time: 295, type: 'write', section: 'personal', title: 'Personal Development Goals', duration: 360, prompt: '"Who do you want to become? How do you want to feel emotionally? What fears do you want to conquer? What would you like to learn? Where would you like to go?"' },
+            { time: 665, type: 'timeline', section: 'personal', title: 'Assign Timelines', duration: 90 },
+            { time: 720, type: 'top3', section: 'personal', title: 'Select Top 3 One-Year Goals' },
+            { time: 750, type: 'why', section: 'personal', goalIndex: 0, title: 'Why Goal #1?', duration: 120 },
+            { time: 870, type: 'why', section: 'personal', goalIndex: 1, title: 'Why Goal #2?', duration: 120 },
+            { time: 930, type: 'why', section: 'personal', goalIndex: 2, title: 'Why Goal #3?', duration: 120 },
+            { time: 1050, type: 'write', section: 'things', title: 'Thing Goals', duration: 150, prompt: '"Imagine you\'re a little kid again with no limits. What do you want to have, do, or create? Cars? Homes? Travel? Adventures?"' },
+            { time: 1250, type: 'timeline', section: 'things', title: 'Assign Timelines', duration: 60 },
+            { time: 1320, type: 'top3', section: 'things', title: 'Select Top 3 Thing Goals' },
+            { time: 1380, type: 'why', section: 'things', goalIndex: 0, title: 'Why These Things?', duration: 360 },
+            { time: 1500, type: 'write', section: 'financial', title: 'Financial Goals', duration: 120, prompt: '"What do you want to earn per month? Per year? What\'s your net worth goal? Investment goals? Retirement goals? What do you want to give?"' },
+            { time: 1650, type: 'timeline', section: 'financial', title: 'Organize by Timeline', duration: 90 },
+            { time: 1750, type: 'why', section: 'financial', goalIndex: 0, title: 'Financial Commitment', duration: 90 },
+            { time: 1900, type: 'action', title: 'Immediate Action Steps' },
+            { time: 2100, type: 'rockingChair', title: 'Rocking Chair Test' }
+        ];
+
+        let currentPauseIndex = -1;
+        let timerInterval = null;
+        let currentTimerSeconds = 0;
+        let selectedTop3 = [];
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        function init() {
+            const video = document.getElementById('workshopVideo');
+            video.addEventListener('timeupdate', checkPausePoints);
+            loadSavedData();
+        }
+
+        function loadSavedData() {
+            const saved = localStorage.getItem('goalWorkshop_' + currentProfile);
+            if (saved) {
+                workshopData = JSON.parse(saved);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('goalWorkshop_' + currentProfile, JSON.stringify(workshopData));
+        }
+
+        // ==========================================
+        // PROFILE MANAGEMENT
+        // ==========================================
+        function selectProfile(name) {
+            document.getElementById('customName').value = name;
+            document.querySelectorAll('.profile-btn').forEach(btn => {
+                btn.classList.remove('border-coral', 'border-golden', 'border-sage');
+            });
+            event.target.classList.add('border-2');
+        }
+
+        function startWorkshop() {
+            const customName = document.getElementById('customName').value.trim();
+            if (!customName) {
+                alert('Please enter or select a name');
+                return;
+            }
+            currentProfile = customName;
+            loadSavedData();
+
+            document.getElementById('profileScreen').classList.add('hidden');
+            document.getElementById('workshopScreen').classList.remove('hidden');
+            document.getElementById('currentUser').textContent = currentProfile + "'s Goals";
+
+            updateProgress();
+        }
+
+        function switchProfile() {
+            saveData();
+            document.getElementById('workshopScreen').classList.add('hidden');
+            document.getElementById('summaryScreen').classList.add('hidden');
+            document.getElementById('profileScreen').classList.remove('hidden');
+
+            const video = document.getElementById('workshopVideo');
+            video.pause();
+            clearInterval(timerInterval);
+        }
+
+        // ==========================================
+        // VIDEO CONTROL
+        // ==========================================
+        function checkPausePoints() {
+            const video = document.getElementById('workshopVideo');
+            const currentTime = video.currentTime;
+
+            for (let i = 0; i < pausePoints.length; i++) {
+                const point = pausePoints[i];
+                if (currentTime >= point.time && currentTime < point.time + 2 && i > currentPauseIndex) {
+                    video.pause();
+                    currentPauseIndex = i;
+                    handlePausePoint(point);
+                    break;
+                }
+            }
+        }
+
+        function handlePausePoint(point) {
+            document.getElementById('videoOverlay').classList.remove('hidden');
+            document.getElementById('currentSection').innerHTML = `<span class="font-semibold">Current:</span> ${point.title}`;
+
+            hideAllStates();
+
+            switch(point.type) {
+                case 'write':
+                    showWritingState(point);
+                    break;
+                case 'timeline':
+                    showTimelineState(point);
+                    break;
+                case 'top3':
+                    showTop3State(point);
+                    break;
+                case 'why':
+                    showWhyState(point);
+                    break;
+                case 'action':
+                    showActionState();
+                    break;
+                case 'rockingChair':
+                    showRockingChairState();
+                    break;
+            }
+
+            updateProgress();
+        }
+
+        function hideAllStates() {
+            document.getElementById('waitingState').classList.add('hidden');
+            document.getElementById('writingState').classList.add('hidden');
+            document.getElementById('timelineState').classList.add('hidden');
+            document.getElementById('top3State').classList.add('hidden');
+            document.getElementById('whyState').classList.add('hidden');
+            document.getElementById('actionState').classList.add('hidden');
+            document.getElementById('rockingChairState').classList.add('hidden');
+        }
+
+        function continueVideo() {
+            document.getElementById('videoOverlay').classList.add('hidden');
+            hideAllStates();
+            document.getElementById('waitingState').classList.remove('hidden');
+
+            const video = document.getElementById('workshopVideo');
+            video.play();
+            clearInterval(timerInterval);
+        }
+
+        // ==========================================
+        // WRITING STATE
+        // ==========================================
+        function showWritingState(point) {
+            document.getElementById('writingState').classList.remove('hidden');
+            document.getElementById('writingTitle').textContent = point.title;
+            document.getElementById('promptArea').textContent = point.prompt || '';
+            document.getElementById('goalsInput').value = workshopData[point.section]?.goals.join('\n') || '';
+
+            currentTimerSeconds = point.duration;
+            startTimer('timerCircle', 'timerDisplay', point.duration);
+
+            // Store current section for saving
+            document.getElementById('goalsInput').dataset.section = point.section;
+        }
+
+        function finishWriting() {
+            const input = document.getElementById('goalsInput');
+            const section = input.dataset.section;
+            const goals = input.value.split('\n').filter(g => g.trim());
+
+            workshopData[section].goals = goals;
+            saveData();
+            continueVideo();
+        }
+
+        // ==========================================
+        // TIMELINE STATE
+        // ==========================================
+        function showTimelineState(point) {
+            document.getElementById('timelineState').classList.remove('hidden');
+            const container = document.getElementById('goalsForTimeline');
+            container.innerHTML = '';
+
+            const goals = workshopData[point.section].goals;
+            goals.forEach((goal, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-gray-50 rounded-lg p-3 flex items-center justify-between gap-2';
+                div.innerHTML = `
+                    <span class="flex-1 text-sm">${goal}</span>
+                    <div class="flex gap-1">
+                        ${[1, 3, 5, 10, 20].map(yr => `
+                            <button onclick="setTimeline('${point.section}', ${index}, ${yr})"
+                                class="timeline-btn-${point.section}-${index} px-2 py-1 text-xs rounded ${workshopData[point.section].timelines[index] === yr ? 'bg-coral text-white' : 'bg-gray-200 hover:bg-gray-300'}">${yr}yr</button>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            container.dataset.section = point.section;
+        }
+
+        function setTimeline(section, index, years) {
+            workshopData[section].timelines[index] = years;
+            saveData();
+
+            // Update button styles
+            document.querySelectorAll(`.timeline-btn-${section}-${index}`).forEach(btn => {
+                btn.classList.remove('bg-coral', 'text-white');
+                btn.classList.add('bg-gray-200');
+            });
+            event.target.classList.remove('bg-gray-200');
+            event.target.classList.add('bg-coral', 'text-white');
+        }
+
+        function finishTimelines() {
+            continueVideo();
+        }
+
+        // ==========================================
+        // TOP 3 SELECTION STATE
+        // ==========================================
+        function showTop3State(point) {
+            document.getElementById('top3State').classList.remove('hidden');
+            selectedTop3 = [...(workshopData[point.section].top3 || [])];
+
+            const container = document.getElementById('oneYearGoals');
+            container.innerHTML = '';
+
+            const goals = workshopData[point.section].goals;
+            const timelines = workshopData[point.section].timelines;
+
+            goals.forEach((goal, index) => {
+                if (timelines[index] === 1) {
+                    const div = document.createElement('div');
+                    div.className = `goal-select p-3 rounded-lg cursor-pointer transition-all ${selectedTop3.includes(index) ? 'bg-coral text-white' : 'bg-gray-100 hover:bg-gray-200'}`;
+                    div.textContent = goal;
+                    div.onclick = () => toggleTop3Selection(point.section, index, goal);
+                    container.appendChild(div);
+                }
+            });
+
+            container.dataset.section = point.section;
+            updateTop3Display(point.section);
+        }
+
+        function toggleTop3Selection(section, index, goal) {
+            const pos = selectedTop3.indexOf(index);
+            if (pos > -1) {
+                selectedTop3.splice(pos, 1);
+            } else if (selectedTop3.length < 3) {
+                selectedTop3.push(index);
+            }
+
+            workshopData[section].top3 = selectedTop3;
+            saveData();
+
+            // Refresh display
+            const container = document.getElementById('oneYearGoals');
+            const goals = workshopData[section].goals;
+            const timelines = workshopData[section].timelines;
+
+            container.innerHTML = '';
+            goals.forEach((g, i) => {
+                if (timelines[i] === 1) {
+                    const div = document.createElement('div');
+                    div.className = `goal-select p-3 rounded-lg cursor-pointer transition-all ${selectedTop3.includes(i) ? 'bg-coral text-white' : 'bg-gray-100 hover:bg-gray-200'}`;
+                    div.textContent = g;
+                    div.onclick = () => toggleTop3Selection(section, i, g);
+                    container.appendChild(div);
+                }
+            });
+
+            updateTop3Display(section);
+        }
+
+        function updateTop3Display(section) {
+            document.getElementById('selectedCount').textContent = selectedTop3.length;
+
+            const btn = document.getElementById('top3ContinueBtn');
+            if (selectedTop3.length === 3) {
+                btn.disabled = false;
+                btn.className = 'w-full gradient-warm text-white font-semibold py-3 rounded-xl cursor-pointer transition-colors';
+                btn.textContent = 'Continue Video →';
+            } else {
+                btn.disabled = true;
+                btn.className = 'w-full bg-gray-300 text-gray-500 font-semibold py-3 rounded-xl cursor-not-allowed';
+                btn.textContent = `Select ${3 - selectedTop3.length} more goal${selectedTop3.length === 2 ? '' : 's'}`;
+            }
+
+            btn.dataset.section = section;
+        }
+
+        function finishTop3Selection() {
+            continueVideo();
+        }
+
+        // ==========================================
+        // WHY STATE
+        // ==========================================
+        function showWhyState(point) {
+            document.getElementById('whyState').classList.remove('hidden');
+
+            const goalIndex = workshopData[point.section].top3[point.goalIndex] || 0;
+            const goal = workshopData[point.section].goals[goalIndex] || 'Your goal';
+
+            document.getElementById('whyGoalDisplay').textContent = goal;
+            document.getElementById('whyInput').value = workshopData[point.section].whys[point.goalIndex] || '';
+            document.getElementById('whyInput').dataset.section = point.section;
+            document.getElementById('whyInput').dataset.goalIndex = point.goalIndex;
+
+            startTimer('whyTimerCircle', 'whyTimerDisplay', point.duration);
+        }
+
+        function finishWhy() {
+            const input = document.getElementById('whyInput');
+            const section = input.dataset.section;
+            const goalIndex = parseInt(input.dataset.goalIndex);
+
+            workshopData[section].whys[goalIndex] = input.value;
+            saveData();
+            continueVideo();
+        }
+
+        // ==========================================
+        // ACTION STEPS STATE
+        // ==========================================
+        function showActionState() {
+            document.getElementById('actionState').classList.remove('hidden');
+            const container = document.getElementById('actionGoals');
+            container.innerHTML = '';
+
+            ['personal', 'things', 'financial'].forEach(section => {
+                const top3 = workshopData[section].top3 || [];
+                top3.forEach((goalIndex, i) => {
+                    const goal = workshopData[section].goals[goalIndex];
+                    if (goal) {
+                        const key = `${section}_${i}`;
+                        const div = document.createElement('div');
+                        div.className = 'bg-gray-50 rounded-lg p-4';
+                        div.innerHTML = `
+                            <p class="font-semibold text-sunset mb-2">${goal}</p>
+                            <input type="text"
+                                class="action-input w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-coral focus:outline-none"
+                                placeholder="One action I'll take TODAY..."
+                                data-key="${key}"
+                                value="${workshopData.actions[key] || ''}"
+                                onchange="saveAction(this)">
+                        `;
+                        container.appendChild(div);
+                    }
+                });
+            });
+        }
+
+        function saveAction(input) {
+            workshopData.actions[input.dataset.key] = input.value;
+            saveData();
+        }
+
+        function finishActions() {
+            document.querySelectorAll('.action-input').forEach(input => {
+                workshopData.actions[input.dataset.key] = input.value;
+            });
+            saveData();
+            continueVideo();
+        }
+
+        // ==========================================
+        // ROCKING CHAIR STATE
+        // ==========================================
+        function showRockingChairState() {
+            document.getElementById('rockingChairState').classList.remove('hidden');
+            document.getElementById('rockingChairPain').value = workshopData.rockingChair.pain || '';
+            document.getElementById('rockingChairPleasure').value = workshopData.rockingChair.pleasure || '';
+        }
+
+        function finishWorkshop() {
+            workshopData.rockingChair.pain = document.getElementById('rockingChairPain').value;
+            workshopData.rockingChair.pleasure = document.getElementById('rockingChairPleasure').value;
+            workshopData.completed = true;
+            saveData();
+
+            showConfetti();
+            setTimeout(() => showSummary(), 1500);
+        }
+
+        // ==========================================
+        // TIMER
+        // ==========================================
+        function startTimer(circleId, displayId, seconds) {
+            clearInterval(timerInterval);
+            currentTimerSeconds = seconds;
+            const totalSeconds = seconds;
+            const circumference = 163.36;
+
+            updateTimerDisplay(displayId, currentTimerSeconds);
+            document.getElementById(circleId).style.strokeDashoffset = 0;
+
+            timerInterval = setInterval(() => {
+                currentTimerSeconds--;
+                updateTimerDisplay(displayId, currentTimerSeconds);
+
+                const progress = (totalSeconds - currentTimerSeconds) / totalSeconds;
+                document.getElementById(circleId).style.strokeDashoffset = circumference * progress;
+
+                if (currentTimerSeconds <= 30) {
+                    document.getElementById(displayId).classList.add('pulse-warning');
+                }
+
+                if (currentTimerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById(displayId).classList.remove('pulse-warning');
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay(displayId, seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            document.getElementById(displayId).textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function needMoreTime() {
+            currentTimerSeconds += 60;
+        }
+
+        // ==========================================
+        // PROGRESS
+        // ==========================================
+        function updateProgress() {
+            const progress = ((currentPauseIndex + 1) / pausePoints.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('currentStep').textContent = currentPauseIndex + 2;
+            document.getElementById('totalSteps').textContent = pausePoints.length;
+        }
+
+        // ==========================================
+        // SUMMARY
+        // ==========================================
+        function showSummary() {
+            document.getElementById('workshopScreen').classList.add('hidden');
+            document.getElementById('summaryScreen').classList.remove('hidden');
+
+            document.getElementById('summaryName').textContent = currentProfile + "'s Goals";
+            document.getElementById('summaryDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('commitmentSignature').textContent = currentProfile;
+            document.getElementById('commitmentDate').textContent = new Date().toLocaleDateString();
+
+            // Populate goals
+            populateSummarySection('summaryPersonal', 'personal');
+            populateSummarySection('summaryThings', 'things');
+            populateSummarySection('summaryFinancial', 'financial');
+
+            document.getElementById('summaryPain').textContent = workshopData.rockingChair.pain || 'Not completed';
+            document.getElementById('summaryPleasure').textContent = workshopData.rockingChair.pleasure || 'Not completed';
+        }
+
+        function populateSummarySection(containerId, section) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            const top3 = workshopData[section].top3 || [];
+            top3.forEach((goalIndex, i) => {
+                const goal = workshopData[section].goals[goalIndex];
+                const why = workshopData[section].whys[i] || '';
+                const action = workshopData.actions[`${section}_${i}`] || '';
+
+                if (goal) {
+                    const div = document.createElement('div');
+                    div.className = 'bg-gray-50 rounded-lg p-4';
+                    div.innerHTML = `
+                        <p class="font-bold text-sunset">${i + 1}. ${goal}</p>
+                        ${why ? `<p class="text-gray-600 mt-2 italic">"${why}"</p>` : ''}
+                        ${action ? `<p class="text-coral mt-2"><strong>Action:</strong> ${action}</p>` : ''}
+                    `;
+                    container.appendChild(div);
+                }
+            });
+
+            if (top3.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 italic">No goals set yet</p>';
+            }
+        }
+
+        function hideSummary() {
+            document.getElementById('summaryScreen').classList.add('hidden');
+            document.getElementById('workshopScreen').classList.remove('hidden');
+        }
+
+        // ==========================================
+        // CONFETTI
+        // ==========================================
+        function showConfetti() {
+            const container = document.getElementById('confettiContainer');
+            const colors = ['#e07a5f', '#f2cc8f', '#81b29a', '#3d405b', '#f4a261'];
+
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti absolute w-3 h-3 rounded';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(confetti);
+            }
+
+            setTimeout(() => container.innerHTML = '', 5000);
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
