@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="htmlRoot">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -82,7 +82,10 @@
 <body class="gradient-bg min-h-screen">
     <!-- Profile Selection Screen -->
     <div id="profileScreen" class="min-h-screen flex items-center justify-center p-4">
-        <div class="bg-white/90 backdrop-blur rounded-3xl shadow-2xl p-8 max-w-lg w-full text-center">
+        <div class="bg-white/90 backdrop-blur rounded-3xl shadow-2xl p-8 max-w-lg w-full text-center relative">
+            <button onclick="toggleLanguage()" id="langToggleProfile" class="absolute top-4 right-4 bg-sunset/10 hover:bg-sunset/20 text-sunset font-bold px-3 py-2 rounded-lg transition-colors text-sm">
+                ES 🇪🇸
+            </button>
             <h1 class="text-4xl font-display font-bold text-sunset mb-2">Goal Setting Workshop</h1>
             <p class="text-coral text-lg mb-2">Tony Robbins - Personal Power Day 12</p>
             <p class="text-gray-600 mb-8">Create your compelling future as a family</p>
@@ -125,15 +128,18 @@
                 <div class="flex items-center gap-3">
                     <span class="text-2xl">🎯</span>
                     <div>
-                        <h2 class="font-display font-bold text-sunset">Goal Setting Workshop</h2>
+                        <h2 class="font-display font-bold text-sunset" id="headerTitle">Goal Setting Workshop</h2>
                         <p class="text-sm text-coral" id="currentUser">Charles's Goals</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
-                    <button onclick="switchProfile()" class="text-sunset hover:text-coral transition-colors text-sm">
+                    <button onclick="toggleLanguage()" id="langToggle" class="bg-sunset/10 hover:bg-sunset/20 text-sunset font-bold px-3 py-2 rounded-lg transition-colors text-sm">
+                        ES 🇪🇸
+                    </button>
+                    <button onclick="switchProfile()" class="text-sunset hover:text-coral transition-colors text-sm" data-i18n="switchProfile">
                         Switch Profile
                     </button>
-                    <button onclick="showSummary()" class="bg-sage text-white px-4 py-2 rounded-lg hover:bg-sage/80 transition-colors">
+                    <button onclick="showSummary()" class="bg-sage text-white px-4 py-2 rounded-lg hover:bg-sage/80 transition-colors" data-i18n="viewSummary">
                         View Summary
                     </button>
                 </div>
@@ -335,7 +341,7 @@
                                 </div>
                                 <div id="action-inputs" class="space-y-3">
                                     <!-- Will be populated dynamically -->
-                                    <p class="text-gray-400 text-sm">Complete your Top 3 selections first to see your action items here.</p>
+                                    <p id="action-placeholder" class="text-gray-400 text-sm">Complete your Top 3 selections first to see your action items here.</p>
                                 </div>
                             </div>
                         </div>
@@ -473,6 +479,144 @@
 
     <script>
         // ==========================================
+        // TRANSLATIONS
+        // ==========================================
+        const translations = {
+            en: {
+                title: "Goal Setting Workshop",
+                subtitle: "Tony Robbins - Personal Power Day 12",
+                tagline: "Create your compelling future as a family",
+                whosDoing: "Who's doing the workshop?",
+                enterName: "Or enter a new name:",
+                namePlaceholder: "Enter name...",
+                beginWorkshop: "Begin Workshop",
+                savedLocally: "Your goals are saved locally on this device",
+                switchProfile: "Switch Profile",
+                viewSummary: "View Summary",
+                goalsLabel: "'s Goals",
+                videoControl: "🎬 You control the video!",
+                videoTip: "Watch together as a family. When Tony says \"begin\" or \"start\", pause the video and use the writing sections on the right.",
+                tipLabel: "Tip:",
+                tipText: "Keep your pen moving during brainstorming! Don't stop to think - just write.",
+                writingSections: "📝 Writing Sections",
+                clickToExpand: "Click a section to expand. Your work saves automatically.",
+                personalDev: "1. Personal Development Goals",
+                personalDesc: "Who you want to become (6 min)",
+                personalQuote: "\"Who do you want to become? What fears do you want to conquer? What would you like to learn? Where would you like to go? What character traits do you want?\"",
+                startTimer: "⏱️ Start",
+                minTimer: "min timer",
+                personalPlaceholder: "Write each goal on a new line...\n\nExamples:\n- Learn to speak Spanish\n- Read 24 books this year\n- Run a marathon\n- Become more patient",
+                thingGoals: "2. Thing Goals",
+                thingsDesc: "Fun stuff with no limits (2.5 min)",
+                thingsQuote: "\"Imagine you're a little kid again with NO limits. What do you want to have, do, or create? Cars? Homes? Travel? A yacht? A helicopter?\"",
+                thingsPlaceholder: "Write each goal on a new line...\n\nExamples:\n- Beach house in Hawaii\n- Tesla Model S\n- Trip to Japan\n- Home theater",
+                financialGoals: "3. Financial Goals",
+                financialDesc: "Money, investments, giving (2 min)",
+                financialQuote: "\"What do you want to earn per month? Per year? What's your net worth goal? Investment goals? Retirement? What do you want to give each year?\"",
+                financialPlaceholder: "Write each goal on a new line...\n\nExamples:\n- Earn $10,000/month\n- Net worth of $1M by age 50\n- Max out retirement accounts\n- Give $500/month to charity",
+                timelinesTop3: "4. Timelines & Top 3",
+                timelinesDesc: "Pick your most exciting 1-year goals",
+                selectTop3: "Select your Top 3 one-year goals from each category. These should really excite you!",
+                personalTop3: "🌱 Personal Development - Top 3:",
+                thingsTop3: "✨ Thing Goals - Top 3:",
+                financialTop3: "💰 Financial - Top 3:",
+                whyCommitted: "WHY are you committed to these goals? Write a paragraph...",
+                addGoalsFirst: "Add goals in section above first",
+                actionSteps: "5. Action Steps",
+                actionDesc: "ONE action per goal for TODAY",
+                actionQuote: "\"Never leave the site of a goal without taking some action towards its attainment. What ONE thing can you do TODAY for each goal?\"",
+                completeTop3First: "Complete your Top 3 selections first to see your action items here.",
+                actionPlaceholder: "One action I'll take TODAY...",
+                rockingChair: "6. Rocking Chair Test",
+                rockingDesc: "Life reflection at 85-90",
+                rockingQuote: "\"Imagine you're 85-90 years old, sitting in your rocking chair, looking back on your life...\"",
+                ifDidnt: "If you DIDN'T achieve these goals, how would you feel?",
+                painPlaceholder: "What would you miss out on? What would it cost you?",
+                ifDid: "If you DID achieve ALL these goals, how would you feel?",
+                pleasurePlaceholder: "How would you feel about your life? What joy would you have experienced?",
+                completeWorkshop: "Complete Workshop! 🎉",
+                summaryTitle: "Your Goals Summary",
+                back: "← Back",
+                printGoals: "🖨️ Print Goals",
+                tonyQuote: "\"The purpose of a goal is not to get it. The purpose of a goal is who you become in pursuit of it.\"",
+                rockingReflection: "🪑 Rocking Chair Reflection",
+                ifNotAchieve: "If I don't achieve these goals:",
+                whenAchieve: "When I achieve these goals:",
+                notCompleted: "Not completed",
+                commitment: "I am committed to achieving these goals.",
+                noGoalsSelected: "No goals selected",
+                action: "Action:"
+            },
+            es: {
+                title: "Taller de Establecimiento de Metas",
+                subtitle: "Tony Robbins - Poder Personal Día 12",
+                tagline: "Crea tu futuro convincente en familia",
+                whosDoing: "¿Quién está haciendo el taller?",
+                enterName: "O ingresa un nuevo nombre:",
+                namePlaceholder: "Ingresa nombre...",
+                beginWorkshop: "Comenzar Taller",
+                savedLocally: "Tus metas se guardan localmente en este dispositivo",
+                switchProfile: "Cambiar Perfil",
+                viewSummary: "Ver Resumen",
+                goalsLabel: " - Metas",
+                videoControl: "🎬 ¡Tú controlas el video!",
+                videoTip: "Miren juntos en familia. Cuando Tony diga \"comienza\" o \"empieza\", pausa el video y usa las secciones de escritura a la derecha.",
+                tipLabel: "Consejo:",
+                tipText: "¡Mantén tu pluma en movimiento durante la lluvia de ideas! No te detengas a pensar - solo escribe.",
+                writingSections: "📝 Secciones de Escritura",
+                clickToExpand: "Haz clic en una sección para expandir. Tu trabajo se guarda automáticamente.",
+                personalDev: "1. Metas de Desarrollo Personal",
+                personalDesc: "Quién quieres ser (6 min)",
+                personalQuote: "\"¿En quién quieres convertirte? ¿Qué miedos quieres conquistar? ¿Qué te gustaría aprender? ¿A dónde te gustaría ir? ¿Qué rasgos de carácter quieres?\"",
+                startTimer: "⏱️ Iniciar",
+                minTimer: "min temporizador",
+                personalPlaceholder: "Escribe cada meta en una nueva línea...\n\nEjemplos:\n- Aprender a hablar inglés\n- Leer 24 libros este año\n- Correr un maratón\n- Ser más paciente",
+                thingGoals: "2. Metas de Cosas",
+                thingsDesc: "Cosas divertidas sin límites (2.5 min)",
+                thingsQuote: "\"Imagina que eres un niño pequeño otra vez SIN límites. ¿Qué quieres tener, hacer o crear? ¿Autos? ¿Casas? ¿Viajes? ¿Un yate? ¿Un helicóptero?\"",
+                thingsPlaceholder: "Escribe cada meta en una nueva línea...\n\nEjemplos:\n- Casa en la playa en Hawaii\n- Tesla Model S\n- Viaje a Japón\n- Cine en casa",
+                financialGoals: "3. Metas Financieras",
+                financialDesc: "Dinero, inversiones, donaciones (2 min)",
+                financialQuote: "\"¿Cuánto quieres ganar por mes? ¿Por año? ¿Cuál es tu meta de patrimonio neto? ¿Metas de inversión? ¿Jubilación? ¿Cuánto quieres donar cada año?\"",
+                financialPlaceholder: "Escribe cada meta en una nueva línea...\n\nEjemplos:\n- Ganar $10,000/mes\n- Patrimonio de $1M a los 50\n- Maximizar cuentas de jubilación\n- Donar $500/mes a caridad",
+                timelinesTop3: "4. Plazos y Top 3",
+                timelinesDesc: "Elige tus metas más emocionantes a 1 año",
+                selectTop3: "Selecciona tus Top 3 metas a un año de cada categoría. ¡Estas deben realmente emocionarte!",
+                personalTop3: "🌱 Desarrollo Personal - Top 3:",
+                thingsTop3: "✨ Metas de Cosas - Top 3:",
+                financialTop3: "💰 Financieras - Top 3:",
+                whyCommitted: "¿POR QUÉ estás comprometido con estas metas? Escribe un párrafo...",
+                addGoalsFirst: "Primero agrega metas en la sección de arriba",
+                actionSteps: "5. Pasos de Acción",
+                actionDesc: "UNA acción por meta para HOY",
+                actionQuote: "\"Nunca dejes el lugar de una meta sin tomar alguna acción hacia su logro. ¿Qué UNA cosa puedes hacer HOY por cada meta?\"",
+                completeTop3First: "Completa primero tus selecciones del Top 3 para ver tus elementos de acción aquí.",
+                actionPlaceholder: "Una acción que tomaré HOY...",
+                rockingChair: "6. Prueba de la Mecedora",
+                rockingDesc: "Reflexión de vida a los 85-90",
+                rockingQuote: "\"Imagina que tienes 85-90 años, sentado en tu mecedora, mirando hacia atrás en tu vida...\"",
+                ifDidnt: "Si NO lograras estas metas, ¿cómo te sentirías?",
+                painPlaceholder: "¿Qué te perderías? ¿Qué te costaría?",
+                ifDid: "Si LOGRARAS TODAS estas metas, ¿cómo te sentirías?",
+                pleasurePlaceholder: "¿Cómo te sentirías acerca de tu vida? ¿Qué alegría habrías experimentado?",
+                completeWorkshop: "¡Completar Taller! 🎉",
+                summaryTitle: "Resumen de tus Metas",
+                back: "← Atrás",
+                printGoals: "🖨️ Imprimir Metas",
+                tonyQuote: "\"El propósito de una meta no es obtenerla. El propósito de una meta es en quién te conviertes en su búsqueda.\"",
+                rockingReflection: "🪑 Reflexión de la Mecedora",
+                ifNotAchieve: "Si no logro estas metas:",
+                whenAchieve: "Cuando logre estas metas:",
+                notCompleted: "No completado",
+                commitment: "Estoy comprometido a lograr estas metas.",
+                noGoalsSelected: "No hay metas seleccionadas",
+                action: "Acción:"
+            }
+        };
+
+        let currentLang = localStorage.getItem('goalWorkshopLang') || 'en';
+
+        // ==========================================
         // STATE MANAGEMENT
         // ==========================================
         let currentProfile = '';
@@ -492,7 +636,196 @@
         // INITIALIZATION
         // ==========================================
         function init() {
-            // Load any existing data
+            // Apply saved language
+            applyLanguage();
+        }
+
+        // ==========================================
+        // LANGUAGE TOGGLE
+        // ==========================================
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'es' : 'en';
+            localStorage.setItem('goalWorkshopLang', currentLang);
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const t = translations[currentLang];
+            const toggle = document.getElementById('langToggle');
+            const toggleProfile = document.getElementById('langToggleProfile');
+            const video = document.getElementById('workshopVideo');
+
+            // Update toggle buttons (header and profile screen)
+            if (toggle) toggle.textContent = currentLang === 'en' ? 'ES 🇪🇸' : 'EN 🇺🇸';
+            if (toggleProfile) toggleProfile.textContent = currentLang === 'en' ? 'ES 🇪🇸' : 'EN 🇺🇸';
+
+            // Update HTML lang attribute
+            document.getElementById('htmlRoot').lang = currentLang;
+
+            // Update page title
+            document.title = t.title + ' - Tony Robbins Day 12';
+
+            // Update video source
+            if (video) {
+                const videoSrc = currentLang === 'es'
+                    ? 'video/tony-robbins-day12-spanish.mp4'
+                    : 'video/tony-robbins-day12.mp4';
+                video.querySelector('source').src = videoSrc;
+                video.load();
+            }
+
+            // Profile screen
+            document.querySelector('#profileScreen h1').textContent = t.title;
+            document.querySelector('#profileScreen .text-coral.text-lg').textContent = t.subtitle;
+            document.querySelector('#profileScreen .text-gray-600').textContent = t.tagline;
+            document.querySelector('#profileScreen label').textContent = t.whosDoing;
+            document.querySelector('#profileScreen .mb-6 label').textContent = t.enterName;
+            document.getElementById('customName').placeholder = t.namePlaceholder;
+            document.querySelector('#profileScreen button.gradient-warm').textContent = t.beginWorkshop;
+            document.querySelector('#profileScreen .text-gray-500.text-sm').textContent = t.savedLocally;
+
+            // Header
+            const headerTitle = document.getElementById('headerTitle');
+            if (headerTitle) headerTitle.textContent = t.title;
+
+            const currentUser = document.getElementById('currentUser');
+            if (currentUser && currentProfile) {
+                currentUser.textContent = currentProfile + t.goalsLabel;
+            }
+
+            document.querySelector('[data-i18n="switchProfile"]').textContent = t.switchProfile;
+            document.querySelector('[data-i18n="viewSummary"]').textContent = t.viewSummary;
+
+            // Video section
+            const videoSection = document.querySelector('.bg-sunset\\/5');
+            if (videoSection) {
+                videoSection.querySelector('.text-sunset.font-semibold').textContent = t.videoControl;
+                videoSection.querySelector('.text-gray-600.text-sm').textContent = t.videoTip;
+                videoSection.querySelector('.bg-golden\\/20 strong').textContent = t.tipLabel;
+                videoSection.querySelector('.bg-golden\\/20 p').innerHTML = '<strong>' + t.tipLabel + '</strong> ' + t.tipText;
+            }
+
+            // Writing sections header
+            const writingHeader = document.querySelector('.custom-scroll h3');
+            if (writingHeader) writingHeader.textContent = t.writingSections;
+            const writingDesc = document.querySelector('.custom-scroll > p');
+            if (writingDesc) writingDesc.textContent = t.clickToExpand;
+
+            // Section 1: Personal Development
+            updateSection('personal', t.personalDev, t.personalDesc, t.personalQuote, t.personalPlaceholder, 6);
+
+            // Section 2: Thing Goals
+            updateSection('things', t.thingGoals, t.thingsDesc, t.thingsQuote, t.thingsPlaceholder, 2.5);
+
+            // Section 3: Financial Goals
+            updateSection('financial', t.financialGoals, t.financialDesc, t.financialQuote, t.financialPlaceholder, 2);
+
+            // Section 4: Timelines & Top 3
+            const top3Section = document.querySelector('[data-section="top3"]');
+            if (top3Section) {
+                top3Section.querySelector('.font-semibold').textContent = t.timelinesTop3;
+                top3Section.querySelector('.text-gray-500').textContent = t.timelinesDesc;
+            }
+            const top3Content = document.getElementById('top3-content');
+            if (top3Content) {
+                const selDesc = top3Content.querySelector('p.text-sm');
+                if (selDesc) selDesc.innerHTML = t.selectTop3;
+
+                const labels = top3Content.querySelectorAll('.mb-4 > .font-semibold');
+                if (labels[0]) labels[0].textContent = t.personalTop3;
+                if (labels[1]) labels[1].textContent = t.thingsTop3;
+                if (labels[2]) labels[2].textContent = t.financialTop3;
+
+                top3Content.querySelectorAll('textarea[id$="-why"]').forEach(ta => {
+                    ta.placeholder = t.whyCommitted;
+                });
+            }
+
+            // Section 5: Action Steps
+            const actionsSection = document.querySelector('[data-section="actions"]');
+            if (actionsSection) {
+                actionsSection.querySelector('.font-semibold').textContent = t.actionSteps;
+                actionsSection.querySelector('.text-gray-500').textContent = t.actionDesc;
+            }
+            const actionsContent = document.getElementById('actions-content');
+            if (actionsContent) {
+                const quote = actionsContent.querySelector('.bg-sunset\\/10');
+                if (quote) quote.textContent = t.actionQuote;
+
+                const placeholder = document.getElementById('action-placeholder');
+                if (placeholder) placeholder.textContent = t.completeTop3First;
+            }
+
+            // Section 6: Rocking Chair
+            const rockingSection = document.querySelector('[data-section="rockingchair"]');
+            if (rockingSection) {
+                rockingSection.querySelector('.font-semibold').textContent = t.rockingChair;
+                rockingSection.querySelector('.text-gray-500').textContent = t.rockingDesc;
+            }
+            const rockingContent = document.getElementById('rockingchair-content');
+            if (rockingContent) {
+                const quote = rockingContent.querySelector('.bg-peach\\/30');
+                if (quote) quote.textContent = t.rockingQuote;
+
+                const labels = rockingContent.querySelectorAll('label');
+                if (labels[0]) labels[0].textContent = t.ifDidnt;
+                if (labels[1]) labels[1].textContent = t.ifDid;
+
+                document.getElementById('rocking-pain').placeholder = t.painPlaceholder;
+                document.getElementById('rocking-pleasure').placeholder = t.pleasurePlaceholder;
+
+                const completeBtn = rockingContent.querySelector('button.gradient-warm');
+                if (completeBtn) completeBtn.textContent = t.completeWorkshop;
+            }
+
+            // Summary screen
+            const summaryScreen = document.getElementById('summaryScreen');
+            if (summaryScreen) {
+                const title = summaryScreen.querySelector('h2');
+                if (title) title.textContent = t.summaryTitle;
+
+                const backBtn = summaryScreen.querySelector('button[onclick="hideSummary()"]');
+                if (backBtn) backBtn.textContent = t.back;
+
+                const printBtn = summaryScreen.querySelector('button[onclick="window.print()"]');
+                if (printBtn) printBtn.textContent = t.printGoals;
+
+                const quote = summaryScreen.querySelector('blockquote');
+                if (quote) {
+                    quote.innerHTML = t.tonyQuote + '<footer class="text-coral mt-2">— Tony Robbins</footer>';
+                }
+
+                const rockingTitle = summaryScreen.querySelector('.bg-sunset\\/5 h3');
+                if (rockingTitle) rockingTitle.textContent = t.rockingReflection;
+
+                const reflectLabels = summaryScreen.querySelectorAll('.bg-sunset\\/5 .font-semibold');
+                if (reflectLabels[0]) reflectLabels[0].textContent = t.ifNotAchieve;
+                if (reflectLabels[1]) reflectLabels[1].textContent = t.whenAchieve;
+
+                const commitment = summaryScreen.querySelector('.text-lg.text-sunset');
+                if (commitment) commitment.textContent = t.commitment;
+            }
+        }
+
+        function updateSection(section, title, desc, quote, placeholder, mins) {
+            const t = translations[currentLang];
+            const sectionEl = document.querySelector(`[data-section="${section}"]`);
+            if (!sectionEl) return;
+
+            sectionEl.querySelector('.font-semibold').textContent = title;
+            sectionEl.querySelector('.text-gray-500').textContent = desc;
+
+            const content = document.getElementById(section + '-content');
+            if (content) {
+                const quoteEl = content.querySelector('.italic');
+                if (quoteEl) quoteEl.textContent = quote;
+
+                const textarea = document.getElementById(section + '-goals');
+                if (textarea) textarea.placeholder = placeholder;
+
+                const timerBtn = content.querySelector('button[onclick*="startSectionTimer"]');
+                if (timerBtn) timerBtn.textContent = t.startTimer + ' ' + mins + ' ' + t.minTimer;
+            }
         }
 
         function loadSavedData() {
@@ -527,9 +860,10 @@
         }
 
         function startWorkshop() {
+            const t = translations[currentLang];
             const customName = document.getElementById('customName').value.trim();
             if (!customName) {
-                alert('Please enter or select a name');
+                alert(currentLang === 'es' ? 'Por favor ingresa o selecciona un nombre' : 'Please enter or select a name');
                 return;
             }
             currentProfile = customName;
@@ -537,7 +871,7 @@
 
             document.getElementById('profileScreen').classList.add('hidden');
             document.getElementById('workshopScreen').classList.remove('hidden');
-            document.getElementById('currentUser').textContent = currentProfile + "'s Goals";
+            document.getElementById('currentUser').textContent = currentProfile + t.goalsLabel;
         }
 
         function switchProfile() {
@@ -637,12 +971,13 @@
         // TOP 3 SELECTION
         // ==========================================
         function populateTop3Lists() {
+            const t = translations[currentLang];
             ['personal', 'things', 'financial'].forEach(section => {
                 const container = document.getElementById(section + '-top3-list');
                 const goals = workshopData[section].goals;
 
                 if (goals.length === 0) {
-                    container.innerHTML = '<p class="text-gray-400 text-sm">Add goals in section above first</p>';
+                    container.innerHTML = `<p class="text-gray-400 text-sm">${t.addGoalsFirst}</p>`;
                     return;
                 }
 
@@ -685,15 +1020,19 @@
         // ACTION INPUTS
         // ==========================================
         function populateActionInputs() {
+            const t = translations[currentLang];
             const container = document.getElementById('action-inputs');
             let html = '';
             let hasGoals = false;
 
+            const sectionNames = currentLang === 'es'
+                ? { personal: '🌱 Personal', things: '✨ Cosas', financial: '💰 Financiera' }
+                : { personal: '🌱 Personal', things: '✨ Things', financial: '💰 Financial' };
+
             ['personal', 'things', 'financial'].forEach(section => {
                 const top3 = workshopData[section].top3;
                 const goals = workshopData[section].goals;
-                const sectionName = section === 'personal' ? '🌱 Personal' :
-                                   section === 'things' ? '✨ Things' : '💰 Financial';
+                const sectionName = sectionNames[section];
 
                 top3.forEach((goalIndex, i) => {
                     const goal = goals[goalIndex];
@@ -705,7 +1044,7 @@
                                 <p class="font-semibold text-sunset text-sm mb-1">${sectionName}: ${goal}</p>
                                 <input type="text"
                                     class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-coral focus:outline-none text-sm"
-                                    placeholder="One action I'll take TODAY..."
+                                    placeholder="${t.actionPlaceholder}"
                                     value="${workshopData.actions[key] || ''}"
                                     onchange="saveAction('${key}', this.value)"
                                     oninput="autoSaveAction('${key}', this.value)">
@@ -716,7 +1055,7 @@
             });
 
             if (!hasGoals) {
-                html = '<p class="text-gray-400 text-sm">Complete your Top 3 selections first to see your action items here.</p>';
+                html = `<p class="text-gray-400 text-sm">${t.completeTop3First}</p>`;
             }
 
             container.innerHTML = html;
@@ -805,32 +1144,35 @@
         // SUMMARY
         // ==========================================
         function showSummary() {
+            const t = translations[currentLang];
             document.getElementById('workshopScreen').classList.add('hidden');
             document.getElementById('summaryScreen').classList.remove('hidden');
 
-            document.getElementById('summaryName').textContent = currentProfile + "'s Goals";
-            document.getElementById('summaryDate').textContent = new Date().toLocaleDateString('en-US', {
+            document.getElementById('summaryName').textContent = currentProfile + t.goalsLabel;
+            const locale = currentLang === 'es' ? 'es-ES' : 'en-US';
+            document.getElementById('summaryDate').textContent = new Date().toLocaleDateString(locale, {
                 weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
             });
             document.getElementById('commitmentSignature').textContent = currentProfile;
-            document.getElementById('commitmentDate').textContent = new Date().toLocaleDateString();
+            document.getElementById('commitmentDate').textContent = new Date().toLocaleDateString(locale);
 
             populateSummarySection('summaryPersonal', 'personal');
             populateSummarySection('summaryThings', 'things');
             populateSummarySection('summaryFinancial', 'financial');
 
-            document.getElementById('summaryPain').textContent = workshopData.rockingChair.pain || 'Not completed';
-            document.getElementById('summaryPleasure').textContent = workshopData.rockingChair.pleasure || 'Not completed';
+            document.getElementById('summaryPain').textContent = workshopData.rockingChair.pain || t.notCompleted;
+            document.getElementById('summaryPleasure').textContent = workshopData.rockingChair.pleasure || t.notCompleted;
         }
 
         function populateSummarySection(containerId, section) {
+            const t = translations[currentLang];
             const container = document.getElementById(containerId);
             const top3 = workshopData[section].top3;
             const goals = workshopData[section].goals;
             const why = workshopData[section].why;
 
             if (top3.length === 0) {
-                container.innerHTML = '<p class="text-gray-400 italic">No goals selected</p>';
+                container.innerHTML = `<p class="text-gray-400 italic">${t.noGoalsSelected}</p>`;
                 return;
             }
 
@@ -842,7 +1184,7 @@
                     html += `
                         <div class="bg-gray-50 rounded-lg p-4">
                             <p class="font-bold text-sunset">${i + 1}. ${goal}</p>
-                            ${action ? `<p class="text-coral mt-2"><strong>Action:</strong> ${action}</p>` : ''}
+                            ${action ? `<p class="text-coral mt-2"><strong>${t.action}</strong> ${action}</p>` : ''}
                         </div>
                     `;
                 }
